@@ -1,11 +1,16 @@
-import {rules, createComparison} from "../lib/compare.js";
+export const initSearching = (searchField) => {
+  return (data, state, action) => {
+    const searchTerm = state[searchField]?.toLowerCase();
 
+    if (!searchTerm) return data;
 
-export function initSearching(searchField) {
-    // @todo: #5.1 — настроить компаратор
+    return data.filter((row) => {
+      const searchFields = ["date", "seller", "customer", "id"];
 
-    return (data, state, action) => {
-        // @todo: #5.2 — применить компаратор
-        return data;
-    }
-}
+      return searchFields.some((field) => {
+        const value = row[field];
+        return value && value.toString().toLowerCase().includes(searchTerm);
+      });
+    });
+  };
+};
