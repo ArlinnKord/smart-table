@@ -12,7 +12,7 @@ import { initFiltering } from "./components/filtering.js";
 import { initSorting } from "./components/sorting.js";
 import { initPagination } from "./components/pagination.js";
 
-const api = initData(sourceData);
+const api = initData();
 
 /**
  * Сбор и обработка полей из таблицы
