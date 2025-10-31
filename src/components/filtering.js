@@ -1,32 +1,47 @@
-import { createComparison, defaultRules } from "../lib/compare.js";
-
-export const initFiltering = (elements, indexes) => {
-    // @todo: #4.1 — заполнить выпадающие списки данными
+export const initFiltering = (elements) => {
+  const updateIndexes = (elements, indexes) => {
     Object.keys(indexes).forEach((elementName) => {
-        elements[elementName].append(
-            ...Object.values(indexes[elementName]).map(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                return option;
-            })
-        );
+      elements[elementName].append(
+        ...Object.values(indexes[elementName]).map((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          return option;
+        })
+      );
+    });
+  };
+
+  const applyFiltering = (query, state, action) => {
+    // @todo: #4.2 — очистка полей фильтров
+    if (action && action.name === "clear") {
+      const field = action.dataset.field;
+      const parent = action.closest(".filter-group");
+      const input = parent.querySelector("input, select");
+      if (input) input.value = "";
+      state[field] = "";
+    }
+
+    // @todo: #4.5 — применить фильтрацию к данным
+    const filter = {};
+    Object.keys(elements).forEach((key) => {
+      if (elements[key]) {
+        if (
+          ["INPUT", "SELECT"].includes(elements[key].tagName) &&
+          elements[key].value
+        ) {
+          filter[`filter[${elements[key].name}]`] = elements[key].value;
+        }
+      }
     });
 
-    // @todo: #4.3 — настроить функцию сравнения
-    const compare = createComparison(defaultRules);
+    return Object.keys(filter).length
+      ? Object.assign({}, query, filter)
+      : query;
+  };
 
-    return (data, state, action) => {
-        // @todo: #4.2 — очистка полей фильтров
-        if (action && action.name === 'clear') {
-            const field = action.dataset.field;
-            const parent = action.closest('.filter-group');
-            const input = parent.querySelector('input, select');
-            if (input) input.value = '';
-            state[field] = '';
-        }
-
-        // @todo: #4.5 — применить фильтрацию к данным
-        return data.filter(row => compare(row, state));
-    };
+  return {
+    updateIndexes,
+    applyFiltering,
+  };
 };
